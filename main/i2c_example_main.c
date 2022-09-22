@@ -392,32 +392,7 @@ typedef struct {
 
 static xQueueHandle s_timer_queue;
 
-//static xQueueHandle s_mqtt_packets_queue;
 
-
-/*
-struct capacity_packets_struct{
-	uint32_t packet_id;
-	int heigh[50];
-	uint8_t capdac;
-};
-*/
-
-
-
-
-/*
- * A simple helper function to print the raw timer counter value
- * and the counter value converted to seconds
- */
-/*
-static void inline print_timer_counter(uint64_t counter_value)
-{
-    printf("Counter: 0x%08x%08x\r\n", (uint32_t) (counter_value >> 32),
-           (uint32_t) (counter_value));
-    printf("Time   : %.8f s\r\n", (double) counter_value / TIMER_SCALE);
-}
-*/
 
 static bool IRAM_ATTR timer_group_isr_callback(void *args)
 {
@@ -525,65 +500,6 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 
 
 
-/*
-static void mqtt_send_packets_task(void* arg){
-
-
-	char packetID_str[12];	//el 12avo elemento es la ',' que separa packetID y ensayoID.
-	char ensayoID_str[11];
-	char heigh_str[5];	//"+hhh\0"
-	char dataToPublish[380];	// son [363] pero por si calcule algo mal, le doy 380.
-	char topic[50];
-	uint32_t ensayoID= -1;	// Cada ensayo consta de varios paquetes sincronizados. El primer paquete de cada ensayo tiene ID=0. Arranca en -1 para compensar primer incremento.
-
-	sprintf(topic, "/topic/nivel/sensor_%d", NUMERO_DE_SENSOR);
-
-	struct capacity_packets_struct packet;
-
-
-	while(1){
-
-		if( xQueueReceive(s_mqtt_packets_queue, &packet, 10000/portTICK_RATE_MS)== pdTRUE){
-
-
-
-			strcpy(dataToPublish, "[");			// no me deja poner dentro de sprintf.
-
-			if(packet.packet_id==0){
-				ensayoID++;
-			}
-
-			sprintf(ensayoID_str, "%d", ensayoID);
-			strcat(dataToPublish, ensayoID_str);
-
-			sprintf(packetID_str, ",%d", packet.packet_id);
-			strcat(dataToPublish, packetID_str);
-
-
-			for(int i=0; i<cantMedidas; i++){
-				strcat(dataToPublish, ",");
-				sprintf(heigh_str, "%d", packet.heigh[i]);
-				strcat(dataToPublish, heigh_str);
-			}
-
-			strcat(dataToPublish, "]");			// no me deja poner dentro de sprintf..
-			//printf("####################\ndatos a publicar: %s\n######################\n", dataToPublish);
-			esp_mqtt_client_publish(client, topic, dataToPublish, 0, 1, 0);
-			//printf("publico<<<<\n");
-			//printf("\n\npaquete: %d enviado\n", packet.packet_id);														//COMENTADO POR DEBUG, NUMERO DE PAQUETE ENVIADO
-
-
-
-
-
-		}
-	}
-
-
-}
-
-*/
-
 
 
 
@@ -626,11 +542,7 @@ static void gpio_task(void* arg)								// VER DIAGRAMA DE FLUJO
             		timer_disable_intr(TIMER_GROUP_0, TIMER_0);
             	}
 
-
-
             }
-
-
 
         }
     }
@@ -651,40 +563,9 @@ static void timer_task(void* arg)							// VER DIAGRAMA DE FLUJO
 {
 	uint8_t syncTest= 0;
 	example_timer_event_t evt;
-
-	//char topic[50];
-	//sprintf(topic, "/topic/nivel/sensor_%d", NUMERO_DE_SENSOR);
-
 	uint8_t pararConfirmado= 0;
-															//Para toma de medidas:
-	//int8_t capdac= 0;
 	uint8_t sampleNumber= 0;
-	//uint32_t packetID= 0;
-	//char packetID_str[11];
-	//char capacidad_str[7];	//"ccc.cc\0"
-	//char dataToPublish[352];						// el formato a enviar: "[ccc.cc,ccc.cc,...,...]\0" -> 50 medidas -> 349+3 = 352.
-
-
-	//float cap_temp;
-	//float capacidad[50];
-
-
-	//float desviacionAceptable= 0.2;
-	//uint8_t cantMuestras= 5;
-	//mean_reliability estructuraResultado;
-
-
-	//struct capacity_packets_struct packets;
-
-
-	//static unsigned char rango= 'M';	// para debug. borrar despues
-	//unsigned char rangoAnterior= 'M';
-	//int8_t rangoLPF= 0;
-
-															//Para toma de medidas.
-
-	//float temp;				// temporal que uso para hacer una media movil
-
+	
 
     for(;;) {
 
@@ -699,184 +580,7 @@ static void timer_task(void* arg)							// VER DIAGRAMA DE FLUJO
 
     		midiendo= 1;
 
-
-
-    		//BLOQUE QUE TOMA UNA SOLA MEDIDA CON CAPDAC FIJO:
-			//read_single_cap_pF(&capacidad[sampleNumber], medidaNIVEL);
-			//capacidad[sampleNumber] = capacidad[sampleNumber]+3.125*CAPDAC_DEFAULT;
-			//FIN BLOQUE QUE TOMA UNA SOLA MEDIDA CON CAPDAC FIJO
-
-
-
-
-
-
-
-    		//BLOQUE MEDIA DE n MEDIDAS:
-    		/*
-    		capacidad[sampleNumber] = 0;
-    		for (int i = 0; i < N_MUESTRAS_MEDIA; i++) {														//
-    			read_single_cap_pF(&temp, medidaNIVEL);
-    			capacidad[sampleNumber] += temp;
-    			usleep(DELAY_ENTREMUESTRAS_US);								//11ms para 100Ss					//
-    		}
-    		capacidad[sampleNumber] /= N_MUESTRAS_MEDIA;														//
-    		capacidad[sampleNumber] = capacidad[sampleNumber] + 3.125 * CAPDAC_DEFAULT;
-			*/
-    		//MEDIA DE n MEDIDAS
-
-
-
-
-    		//BLOQUE QUE FILTRA CON FIR
-
-    		//SampleFilter_put(&signalFilter_struct, capacidad[sampleNumber]);
-    		//capacidad[sampleNumber]= SampleFilter_get(&signalFilter_struct);
-
-    		//BLOQUE QUE FILTRA CON FIR
-
-
-
-
-
-
-    		//PARA TENER UN MUESTREO UNIFORME Y DE 400Ss, SE MIDE Y SE FILTRA EN UNA TAREA DISTINTA.
-			/*
-    		xSemaphoreTake(ultimaMedida_mux, portMAX_DELAY);
-    		capacidad[sampleNumber]= last_filtered_cap;
-    		xSemaphoreGive(ultimaMedida_mux);
-			*/
-    		//FIN BLOQUE QUE LEE CAPACIDAD FILTRADA OBTENIDA DE OTRA TAREA.
-
-
-
-
-
-
-
-
-    		// TOMA DE MEDIDA:
-
-
-    		/* EN TODAS LAS MUESTRAS HACE AUTORANGING, ASI QUE REMPLAZO ESTE BLOQUE POR EL SIGUIENTE.__________________________________________________
-    		if(sampleNumber==0){				// medida de nivel AUTORANGO la primer medida, despues medidas normales:
-				capdac= read_autoranging_cap_pF(capacidad, medidaNIVEL);
-				//printf("primer medida, autoranging\ncapacidad: %0.2f\ncapdac: %d\n", capacidad[0]+capdac*3.125, capdac);
-    		}else{
-    			//read_single_cap_pF(&capacidad[sampleNumber], medidaNIVEL);
-    			read_processed_cap_pF(medidaNIVEL, desviacionAceptable, cantMuestras, &estructuraResultado);
-    			capacidad[sampleNumber]= estructuraResultado.mean;
-    		}
-    		*///EN TODAS LAS MUESTRAS HACE AUTORANGING, ASI QUE REMPLAZO ESTE BLOQUE POR EL SIGUIENTE._________________________________________________
-
-
-
-
-
-    		// ESTE BLOQUE HACE AUTORANGING EN TODAS LAS MEDIDAS (el anterior lo hacia solo en la muestra 0):____________________________
-    		//capdac= read_autoranging_cap_pF(&capacidad[sampleNumber], medidaNIVEL);		//
-    		// FIN DE BLOQUE AUTORANGING EN TODAS LAS MUESTRAS.__________________________________________________________________________
-
-
-
-    		/*
-    		//BLOQUE DE 3 RANGOS DE 28.125pF:______________________________________
-
-    		capdac= CAPDAC_MID_RANGE;
-    		MEASn_capdac_config(capdac, medidaNIVEL);
-    		usleep(8000);		// si este delay es menor a 6ms no alcanza para configurar el offset, y usa el offset anterior al configurado en la linea anterior.
-    		read_single_cap_pF(&capacidad[sampleNumber], medidaNIVEL);
-
-
-    		if(capacidad[sampleNumber]<-12.1){
-
-    			//printf("s: %d cambio al rango inferior vvvv     saturo con C: %f\n", sampleNumber, capacidad[sampleNumber]);		//debug
-
-    			//debug:
-    			if(rango!='L'){
-    				rango='L';
-    				printf("cambio de rango a L\n");
-    			}
-    			//fin debug.
-
-
-    			capdac= CAPDAC_MID_RANGE-6;		// lo empaqueta abajo, hay que actualizarlo.						//cambie de 9 a 8 por debug volver a 9.
-    			if(capdac<CAPDAC_MIN){
-    				printf("CAPDAC MENOR AL MINIMO CAPDAC.<<<<<<<<<<<<<<<<<<\n");
-    				capdac= CAPDAC_MIN;
-    			}
-
-    			//printf("saturo con: %.2f y capdac: %d\n", capacidad[sampleNumber], capdac+9);
-    			MEASn_capdac_config(capdac, medidaNIVEL);
-    			usleep(8000);	// si falla aumentar este delay														//alargue el delay por debug. volver a 8ms
-    			read_single_cap_pF(&capacidad[sampleNumber], medidaNIVEL);
-
-    			//if(rangoAnterior=='M')
-    				capacidad[sampleNumber]= capacidad[sampleNumber]+3.125*capdac+LOWER_RANGE_CORRECTION_OFFSET_FALLING_LVL;
-    			//else
-    				//capacidad[sampleNumber]= capacidad[sampleNumber]+3.125*capdac+LOWER_RANGE_CORRECTION_OFFSET_RISING_LVL;
-
-    			//rangoAnterior= 'L';
-
-    			//printf("la nueva medida en L es: C: %f, capdac: %d _-_-_-_-_-_-_-_-_-_-_-_-\n", capacidad[sampleNumber], capdac);
-
-    		}else if(12.1<capacidad[sampleNumber]){
-
-    			//printf("s: %d cambio al rango superior ^^^^     saturo con C: %f\n", sampleNumber, capacidad[sampleNumber]);		//debug
-
-    			//debug:
-				if(rango!='H'){
-					rango='H';
-
-					printf("cambio de rango a H, cap saturo en C: %.2f con capdac: %d\n", capacidad[sampleNumber], capdac);
-				}
-				//fin debug.
-
-
-				capdac= CAPDAC_MID_RANGE+6;		// lo empaqueta abajo, hay que actualizarlo.
-				if( CAPDAC_MAX < capdac ){
-					capdac= CAPDAC_MAX;
-				}
-
-
-				MEASn_capdac_config(capdac, medidaNIVEL);
-				usleep(8000);	// si falla aumentar este delay
-				read_single_cap_pF(&capacidad[sampleNumber], medidaNIVEL);
-				capacidad[sampleNumber]= capacidad[sampleNumber]+3.125*capdac+UPPER_RANGE_CORRECTION_OFFSET;
-
-				//printf("la nueva medida en H es: C: %.2f con capdac: %d _-_-_-_-_-_-_-_-_-_-_-_-\n", capacidad[sampleNumber], capdac);
-
-
-
-
-
-
-
-    		}else{
-
-    			capacidad[sampleNumber]= capacidad[sampleNumber]+3.125*capdac;
-
-    			//printf("s: %d rango medio-----------------       C: %f\n", sampleNumber, capacidad[sampleNumber]);
-    			//debug:
-				if(rango!='M'){
-					rango='M';
-					printf("la nueva medida en M es: C: %.2f con capdac: %d _-_-_-_-_-_-_-_-_-_-_-_-\n", capacidad[sampleNumber], capdac);
-				}
-
-				//fin debug.
-    		}
-    		//printf("CAPACIDAD ABSOLUTA: %f##########################################\n", capacidad[sampleNumber]+capdac*3.125);
-    		//FIN DE BLOQUE DE 3 RANGOS DE 28.125pF________________________________
-    		*/
-
-
-    		//printf("capdac: %d, Coffset: %f\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", capdac, capdac*3.125);
-
-
     		sampleNumber++;
-
-
-
 
 
     		if( (cantMedidas-1) <sampleNumber){
@@ -888,55 +592,6 @@ static void timer_task(void* arg)							// VER DIAGRAMA DE FLUJO
 				//debug para testear que tan bien se sincronizan.
 
 
-    			//printf("\n\n");
-				/*																										// COMENTADO PARA PROBAR EL FILTRO, DESCOMENTAR PARA IMPRIMIR EL PAQUETE.
-    			for(int j=0; j<50; j++){
-    				packets.heigh[j]= cap_to_mm(ORDEN_APROXIMACION, capacidad[j], COEF_A, COEF_B, COEF_C, COEF_D);
-
-    				packets.heigh[j]-= mm_offset_cal;
-
-    				//printf(",%.2f", capacidad[j]);																						// COMENTADO PARA PROBAR EL FILTRO, DESCOMENTAR PARA IMPRIMIR EL PAQUETE.
-    				//ESP_LOGI("capacidad==>", ",%.2f", capacidad[j]);
-    				ESP_LOGI("altura==>", ",%d", packets.heigh[j]);
-    			}
-    			ESP_LOGI("altura==>","\n\n\n\n_________________________________\n\n\n\n");															// COMENTADO PARA PROBAR EL FILTRO, DESCOMENTAR PARA IMPRIMIR EL PAQUETE.
-				*/
-
-    			//__________________queue__________________________________
-				/*
-				packets.packet_id= packetID;
-				packets.capdac= capdac;
-
-				xQueueSend(s_mqtt_packets_queue, &packets, 5/portTICK_RATE_MS);
-				*/
-				//__________________queue__________________________________
-
-
-
-				//packetID++;
-
-/*
-    			//ENVIAR. ESTA PARTE MUEVO COMPLETA A UNA TAREA NUEVA____________________________________________________________________________________
-				strcpy(dataToPublish, "[");			// no me deja poner dentro de sprintf.
-
-				sprintf(packetID_str, "%d", packetID++);
-				strcat(dataToPublish, packetID_str);
-
-
-				for(int i=0; i<sampleNumber; i++){
-					strcat(dataToPublish, ",");
-					sprintf(capacidad_str, "%.2f", capacidad[i]+3.125*capdac);
-					strcat(dataToPublish, capacidad_str);
-				}
-
-				strcat(dataToPublish, "]");			// no me deja poner dentro de sprintf..
-				//printf("####################\ndatos a publicar: %s\n######################\n", dataToPublish);
-				//esp_mqtt_client_publish(client, topic, dataToPublish, 0, 1, 0);
-				//printf("publico<<<<\n");
-				//FIN ENVIAR. ESTA PARTE MUEVO COMPLETA A UNA TAREA NUEVA________________________________________________________________________________
-*/
-				//sampleNumber= 0;
-
 				if(1<pararConfirmado){
 					midiendo= 0;
 					//packetID= 0;
@@ -946,18 +601,7 @@ static void timer_task(void* arg)							// VER DIAGRAMA DE FLUJO
     		}
 
 
-
-
 			//vTaskDelay((DELAY_TIME_BETWEEN_ITEMS_MS * (task_idx + 1)) / portTICK_RATE_MS);
-
-
-
-
-    		// FIN TOMA DE MEDIDAS.
-
-
-
-
 
     	}
     }
@@ -1023,169 +667,12 @@ static esp_err_t __attribute__((unused)) i2c_master_write_slave(i2c_port_t i2c_n
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 static void log_error_if_nonzero(const char * message, int error_code)
 {
     if (error_code != 0) {
         ESP_LOGE(TAG, "Last error %s: 0x%x", message, error_code);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//esp_mqtt_client_handle_t client;
-
-/*
-static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
-{
-	char msg[50];	//escribo la cadena para no contar y errarle
-	char topicRecibido[50];
-	char stringRecibida[50];
-
-	sprintf(msg, "Sensor %d conectado", NUMERO_DE_SENSOR);
-
-    //esp_mqtt_client_handle_t client = event->client;
-	client = event->client;
-
-    //int msg_id;
-    // your_context_t *context = event->context;
-    switch (event->event_id) {
-
-        case MQTT_EVENT_CONNECTED:
-            ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            esp_mqtt_client_publish(client, "/topic/nivel/connected_sensors", msg, 0, 1, 0);
-
-            //ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-
-            esp_mqtt_client_subscribe(client, "/topic/nivel/cal", 0);					// se suscribe al topic de calibracion
-
-
-            //msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);					// no necesita suscribirse.
-            //ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            //msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");					// no se suscribio, entonces no se des-suscribe.
-            //ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
-            break;
-
-        case MQTT_EVENT_DISCONNECTED:
-            ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-            break;
-
-        //case MQTT_EVENT_SUBSCRIBED:
-            //ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            //msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-            //ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-            //break;
-
-        
-        //case MQTT_EVENT_UNSUBSCRIBED:
-            //ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
-            //break;
-            
-
-        case MQTT_EVENT_PUBLISHED:
-            //ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
-            break;
-
-
-        case MQTT_EVENT_DATA:
-            //ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-            printf("DATA=%.*s\r\n", event->data_len, event->data);
-
-            // ACA COMPARAR SI LO QUE RECIBIO ES == "SN4" (para sensor 4, para cada sensor) topic: "/topic/nivel/cal"
-            if( (event->topic_len) < 40){
-            	sprintf(topicRecibido, "%.*s", event->topic_len, event->topic);
-            	if( !strcmp(topicRecibido, "/topic/nivel/cal") ){
-            		if( (event->data_len) < 40 ){
-            			sprintf(stringRecibida, "%.*s", event->data_len, event->data);
-            			if( !strcmp(stringRecibida, NUMERO_DE_SENSOR_STR) ){
-							mm_offset_cal= mm_mediaMovil;
-            			}
-            		}
-            	}
-            }
-
-            break;
-
-
-        case MQTT_EVENT_ERROR:
-            ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
-            if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
-                log_error_if_nonzero("reported from esp-tls", event->error_handle->esp_tls_last_esp_err);
-                log_error_if_nonzero("reported from tls stack", event->error_handle->esp_tls_stack_err);
-                log_error_if_nonzero("captured as transport's socket errno",  event->error_handle->esp_transport_sock_errno);
-                ESP_LOGI(TAG, "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
-
-            }
-            break;
-
-        default:
-            ESP_LOGI(TAG, "Other event id:%d", event->event_id);
-            break;
-    }
-    return ESP_OK;
-}
-
-*/
-
-
-
-/*
-static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
-    ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
-    mqtt_event_handler_cb(event_data);
-}
-*/
-
-
-
-
-
-
-
-/*
-static void mqtt_app_start(void)
-{
-    esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = CONFIG_BROKER_URL,
-    };
-
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
-    esp_mqtt_client_start(client);
-}
-*/
-
-
-
-
-
-
-
 
 
 
@@ -1226,9 +713,9 @@ static void vLevelMeasureTask(void *arg)
     float mediaMovil_sample[20]= {0};		// hago la media movil de la capacidad filtrada, para obtener un valor medio, se necesita para una mejor calibracion.
     uint8_t mediaMovil_ix= 0;
 
-	//debug{____....
+	//calibracion y debug{____....
 	uint8_t debug= 0;
-	//....____}
+	//....____}calibracion y debug
 
     while (1) {
 
@@ -1253,11 +740,7 @@ static void vLevelMeasureTask(void *arg)
 	   //actualizo la salida del DAC:
 		salidaDac= cap_to_mm(ORDEN_APROXIMACION, last_filtered_cap, COEF_A, COEF_B, COEF_C, COEF_D);
 		
-		//debug{____....
-		//if( ((++debug)%200)==0 )	//printf 1 de cada 10 veces
-			//printf("\n\nDAC: %d\n\n", (uint8_t)salidaDac);
-			//printf("CAPabs: %.2fpF\nCAPrel: %.2fpF\n\n", last_filtered_cap, last_filtered_cap-3.125*((float)CAPDAC_DEFAULT));
-		//....____}debug
+		
 		salidaDac= (salidaDac-mm_offset_cal)*(DAC_MAX-DAC_MIN) / RANGO_MM + DAC_12mA;
 
 		if(salidaDac<DAC_MIN){
@@ -1266,14 +749,18 @@ static void vLevelMeasureTask(void *arg)
 			salidaDac= DAC_MAX;
 		}
 
+		//calibracion(1) y debug{____....
+		//salidaDac= 128;
+		//...._____}calibracion(1) y debug
+
 		dac_output_voltage(DAC_CHANNEL_1, (uint8_t)salidaDac);
 
-		//debug{____....
+		//calibracion(2) y debug{____....
 		if( ((++debug)%200)==0 ){	//printf 1 de cada 10 veces
 			printf("\n\nDAC: %d\n\n", (uint8_t)salidaDac);
 			printf("CAPabs: %.2fpF\nCAPrel: %.2fpF\n\n", last_filtered_cap, last_filtered_cap-3.125*((float)CAPDAC_DEFAULT));
 		}
-		//....____}debug
+		//....____}calibracion(2) y debug
 
 
 
@@ -1323,9 +810,6 @@ void app_main(void)
 
 
 
-
-
-
     //mqtt
     esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
     esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
@@ -1338,24 +822,7 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-	//ESP_ERROR_CHECK(example_connect());	// This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-										// Read "Establishing Wi-Fi or Ethernet Connection" section in examples/protocols/README.md for more information about this function.
-
-	//mqtt_app_start();
-    //mqtt
-
-
-	/*
-    ESP_ERROR_CHECK(i2c_master_init());
-    capacimeter_init(I2C_MASTER_NUM, 0, CUATROCIENTAS_Ss);		// antes abria el puerto, ahora unicamente ejecuta la configuracion inicial (meas_conf y cap_config).
-	usleep(10000);	//lo que sigue tarda, puede ser prescindible este delay.
-	capacimeter_config(CUATROCIENTAS_Ss, medidaNIVEL);
-	usleep(8000);												//afinar este delay
-
-
-    //xTaskCreate(vLevelMeasureTask, "vLevelMeasureTask_0", 1024 * 8, (void *)0, 10, NULL);
-    //xTaskCreate(vLevelMeasureTask, "vLevelMeasureTask_1", 1024 * 2, (void *)1, 10, NULL);
-	*/
+	
 
 
 
@@ -1372,13 +839,6 @@ void app_main(void)
 	usleep(8000);
 	xTaskCreate(vLevelMeasureTask, "vLevelMeasureTask_0", 1024 * 8, (void *)0, 10, NULL);
 	//xTaskCreate(vLevelMeasureTask, "vLevelMeasureTask_1", 1024 * 2, (void *)1, 10, NULL);
-
-
-
-
-
-
-
 
 
 
@@ -1414,11 +874,6 @@ void app_main(void)
 	gpio_config(&io_conf);
 
 
-
-	//create a queue to handle sensor packets
-	//s_mqtt_packets_queue= xQueueCreate(8, sizeof(struct capacity_packets_struct));
-	//start mqtt from queue task
-	//xTaskCreate(mqtt_send_packets_task, "mqttFromQueue_task", 4096, NULL, 10, NULL);
 	
 	//create a queue to handle gpio event from isr
 	gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
@@ -1437,39 +892,11 @@ void app_main(void)
 	timer_enable_intr(TIMER_GROUP_0, TIMER_0);
 	dac_output_enable(DAC_CHANNEL_1);
 
-	/*
-	float filter_out;
-	float filter_in;
-
-	SampleFilter filtroPrueba;
-	SampleFilter_init(&filtroPrueba);
-	*/
+	
 
 	while(1){
 
-
-		//PRUEBA DE FILTRO:
-		/*
-		for(int m=0; m<400; m++){
-			filter_in= sine_1hz[m] + 0.5*sine_2hz[m] + 0.25*sine_5hz[m] + 0.125*sine_10hz[m]+0.5*white_noise[m];
-			SampleFilter_put(&filtroPrueba, filter_in);
-			filter_out= (float)SampleFilter_get(&filtroPrueba);
-			//printf("%.2f,", filter_output);
-			ESP_LOGI("DEBUG..","%.2f,", filter_out);
-
-
-
-		}
-		//printf("\n\n");
-		ESP_LOGI("DEBUG..", "\n\n\n\n\n\n\n\n============================================================================================================\n\n\n\n\n\n\n\n");
-		*/
-		//FIN PRUEBA DE FILTRO.
-
-
-
-
 		vTaskDelay(500/portTICK_RATE_MS);
-
 	}
 
 
@@ -1493,14 +920,4 @@ float cap_sim(void){
 	}
 	return a;
 }
-
-
-
-
-
-
-
-
-
-
 

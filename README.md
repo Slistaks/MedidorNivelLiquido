@@ -3,17 +3,26 @@
 ## Calibracion de cada sensor:
 ### Caracterizacion DAC-Lazo de corriente:
 -Encontrar el valor del DAC para el cual la salida del lazo de corriente es 4mA. Actualizar este valor en el macro "DAC_MIN". (De modo orientativo, este valor esta cercano a 43).  
+ Para esto, modificar el valor del DAC dentro del bloque "calibracion(1) y debug" y modificando el valor del DAC hasta que se mida una corriente de salida de 4mA.  
 -Encontrar el valor del DAC para el cual la salida del lazo de corriente es 20mA. Actualizar este valor en el macro "DAC_MAX". (De modo orientativo, este valor esta cercano a 241).  
+ Para esto, modificar el valor del DAC dentro del bloque "calibracion(1) y debug" y modificando el valor del DAC hasta que se mida una corriente de salida de 20mA.  
 -Encontrar el valor del DAC para el cual la salida del lazo de corriente es 12mA (valor medio entre 4mA y 20mA). Actualizar este valor en el macro "DAC_12mA". (De modo orientativo, este valor esta cercano a 141).  
+ Para esto, modificar el valor del DAC dentro del bloque "calibracion(1) y debug" y modificando el valor del DAC hasta que se mida una corriente de salida de 12mA.  
+-!! Una vez terminado lo anterior, volver a comentar el bloque "calibracion(1) y debug".
   
-### Caracterizacion sensor
+### Caracterizacion sensor:  
 -Sumergir el sensor en agua hasta que deje de medir saturacion inferior y anotar dicha altura.  
 -Continuar sumergiendo el sensor hasta llegar a la saturacion superior, y anotar la altura a la que sucede.  
 -Haciendo la resta de los valores obtenidos anteriormente, actualizar el valor del macro RANGO_MM.  
--Actualizar el valor en la inicializacion de la variable "mm_offset_cal" a RANGO_MM/2. CHEQUEAR ESTA ULTIMA PARTE.
 
+### Transferencia sensor:  
+-Descomentar el bloque "calibracion(2) y debug" para poder observar en el monitor serie las impresiones de capacidad absoluta.  
+-Tomar varias medidas de capacidad para varias alturas, y con el vector de datos resultante encontrar la curva de orden 2 o 3 que mejor se ajuste, siendo la variable independiente la capacidad en pF y la imagen la profundidad de inmersion en mm.  
+-Introducir los coeficientes en el bloque "COEFICIENTES SN1". Si se usan los de segundo orden, cambiar la macro "ORDEN_APROXIMACION".  
+ Coeficientes:  
+	H[mm]= Ax^3 + Bx^2 + Cx + D  	si es de orden 3, x[pF]  
+	H[mm]= Ax^2 + Bx + C 		si es de orden 2, x[pF]  
 
-### Aca poner algo sobre caracterizar el sensor, ir midiendo capacidad y encontrar y modificar los coeficientes.
 ### Acomodar script de octave para que haga todo.
 
 
