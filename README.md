@@ -23,13 +23,40 @@
 	H[mm]= Ax^3 + Bx^2 + Cx + D  	si es de orden 3, x[pF]  
 	H[mm]= Ax^2 + Bx + C 		si es de orden 2, x[pF]  
 
-### Acomodar script de octave para que haga todo.
 
-
-
-
-
-
+### Script de octave para encontrar coeficientes:
+  
+  
+  
+  
+clear all;  
+clc  
+hold off;  
+  
+% Ingresar los vectores de capacidad[pF] y altura[mm] (reemplazar los ingresados como ejemplo):  
+c= [28.365,31.32,33,35.56,37.15,38.02,39.495,40.1,40.535,41,41.375];  
+h= [35,285,385,485,585,685,785,885,985,1085,1185];  
+  
+orden= 3;  
+p= polyfit(c, h, orden);  
+h_aproximacion= p(1)*c.^3 + p(2)*c.^2 + p(3)*c + p(4);  
+error= h_aproximacion - h;  
+  
+plot(c, h, 'g;Medido;')  
+hold on  
+plot(c, h_aproximacion, '--r')  
+disp("Coeficiente A:")  
+disp(num2str(p(1)))  
+disp("Coeficiente B:")  
+disp(num2str(p(2)))  
+disp("Coeficiente C:")  
+disp(num2str(p(3)))  
+disp("Coeficiente D:")  
+disp(num2str(p(4)))  
+    
+  
+  
+  
 ## Overview
 
 
